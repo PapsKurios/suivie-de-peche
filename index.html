@@ -13,7 +13,7 @@
             --silure: #334155;
             --perche: #9a3412;
             --autre: #075985;
-            --ratte: #991b1b;
+            --rate: #991b1b;
             --accent: #f59e0b;
             --text: #f8fafc;
         }
@@ -69,11 +69,10 @@
         .counter-label { font-size: 0.7rem; font-weight: bold; opacity: 0.6; margin-bottom: 4px; letter-spacing: 1px; }
         .counter-num { font-size: 1.8rem; font-weight: 900; }
 
-        /* Style spécifique pour la ligne Ratté */
         .full-width {
             grid-column: span 2;
             background: rgba(153, 27, 27, 0.2);
-            border: 1px solid var(--ratte);
+            border: 1px solid var(--rate);
         }
 
         .buttons-stack {
@@ -107,10 +106,9 @@
         .btn-silure { background: var(--silure); }
         .btn-perche { background: var(--perche); }
         .btn-autre { background: var(--autre); }
-        .btn-ratte { 
-            background: var(--ratte); 
+        .btn-rate { 
+            background: var(--rate); 
             margin-top: 10px;
-            border-radius: 16px;
         }
 
         .footer {
@@ -151,8 +149,8 @@
             <div class="counter-num" id="count-autre" style="color: #38bdf8;">0</div>
         </div>
         <div class="counter-box full-width">
-            <div class="counter-label" style="color: #f87171;">Loupés / Rattés</div>
-            <div class="counter-num" id="count-ratte" style="color: #ef4444;">0</div>
+            <div class="counter-label" style="color: #f87171;">POISSONS RATÉS</div>
+            <div class="counter-num" id="count-rate" style="color: #ef4444;">0</div>
         </div>
     </div>
 
@@ -161,7 +159,7 @@
         <button class="btn btn-silure" onclick="inc('silure')">🐉 SILURE</button>
         <button class="btn btn-perche" onclick="inc('perche')">🦓 PERCHE</button>
         <button class="btn btn-autre" onclick="inc('autre')">🐟 AUTRE</button>
-        <button class="btn btn-ratte" onclick="inc('ratte')">❌ RATTÉ !</button>
+        <button class="btn btn-rate" onclick="inc('rate')">❌ RATÉ !</button>
     </div>
 
     <div class="footer">
@@ -169,18 +167,20 @@
     </div>
 
     <script>
-        let data = JSON.parse(localStorage.getItem('fishLogV2')) || {
-            brochet: 0, silure: 0, perche: 0, autre: 0, ratte: 0
+        // Utilisation de 'rate' au lieu de 'ratte'
+        let data = JSON.parse(localStorage.getItem('fishLogV3')) || {
+            brochet: 0, silure: 0, perche: 0, autre: 0, rate: 0
         };
 
         function refresh() {
             let total = 0;
-            ['brochet', 'silure', 'perche', 'autre', 'ratte'].forEach(id => {
-                document.getElementById('count-' + id).innerText = data[id];
-                if(id !== 'ratte') total += data[id];
+            ['brochet', 'silure', 'perche', 'autre', 'rate'].forEach(id => {
+                const el = document.getElementById('count-' + id);
+                if (el) el.innerText = data[id];
+                if(id !== 'rate') total += data[id];
             });
             document.getElementById('total-text').innerText = 'PRISES : ' + total;
-            localStorage.setItem('fishLogV2', JSON.stringify(data));
+            localStorage.setItem('fishLogV3', JSON.stringify(data));
         }
 
         function inc(type) {
@@ -190,8 +190,8 @@
         }
 
         function reset() {
-            if(confirm("Vider ton carnet de pêche ?")) {
-                data = { brochet: 0, silure: 0, perche: 0, autre: 0, ratte: 0 };
+            if(confirm("Voulez-vous vraiment remettre les compteurs à zéro ?")) {
+                data = { brochet: 0, silure: 0, perche: 0, autre: 0, rate: 0 };
                 refresh();
             }
         }
