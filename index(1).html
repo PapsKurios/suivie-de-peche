@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fishing Tracker Pro</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --brochet: #166534;
+            --silure: #334155;
+            --perche: #9a3412;
+            --autre: #075985;
+            --ratte: #991b1b;
+            --accent: #f59e0b;
+            --text: #f8fafc;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 15px;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, system-ui, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 10px 0 20px 0;
+        }
+
+        .total-badge {
+            background: var(--accent);
+            color: #000;
+            padding: 5px 20px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            display: inline-block;
+        }
+
+        .counters-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .counter-box {
+            background: var(--card);
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .counter-label { font-size: 0.7rem; font-weight: bold; opacity: 0.6; margin-bottom: 4px; letter-spacing: 1px; }
+        .counter-num { font-size: 1.8rem; font-weight: 900; }
+
+        /* Style spécifique pour la ligne Ratté */
+        .full-width {
+            grid-column: span 2;
+            background: rgba(153, 27, 27, 0.2);
+            border: 1px solid var(--ratte);
+        }
+
+        .buttons-stack {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.4);
+            transition: all 0.05s;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.4);
+        }
+
+        .btn-brochet { background: var(--brochet); }
+        .btn-silure { background: var(--silure); }
+        .btn-perche { background: var(--perche); }
+        .btn-autre { background: var(--autre); }
+        .btn-ratte { 
+            background: var(--ratte); 
+            margin-top: 10px;
+            border-radius: 16px;
+        }
+
+        .footer {
+            padding-top: 15px;
+            text-align: center;
+        }
+        
+        .reset-btn {
+            background: none;
+            border: none;
+            color: #475569;
+            font-size: 0.8rem;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="total-badge" id="total-text">PRISES : 0</div>
+    </div>
+
+    <div class="counters-grid">
+        <div class="counter-box">
+            <div class="counter-label">BROCHET</div>
+            <div class="counter-num" id="count-brochet" style="color: #4ade80;">0</div>
+        </div>
+        <div class="counter-box">
+            <div class="counter-label">SILURE</div>
+            <div class="counter-num" id="count-silure" style="color: #94a3b8;">0</div>
+        </div>
+        <div class="counter-box">
+            <div class="counter-label">PERCHE</div>
+            <div class="counter-num" id="count-perche" style="color: #fb923c;">0</div>
+        </div>
+        <div class="counter-box">
+            <div class="counter-label">AUTRE</div>
+            <div class="counter-num" id="count-autre" style="color: #38bdf8;">0</div>
+        </div>
+        <div class="counter-box full-width">
+            <div class="counter-label" style="color: #f87171;">Loupés / Rattés</div>
+            <div class="counter-num" id="count-ratte" style="color: #ef4444;">0</div>
+        </div>
+    </div>
+
+    <div class="buttons-stack">
+        <button class="btn btn-brochet" onclick="inc('brochet')">🐊 BROCHET</button>
+        <button class="btn btn-silure" onclick="inc('silure')">🐉 SILURE</button>
+        <button class="btn btn-perche" onclick="inc('perche')">🦓 PERCHE</button>
+        <button class="btn btn-autre" onclick="inc('autre')">🐟 AUTRE</button>
+        <button class="btn btn-ratte" onclick="inc('ratte')">❌ RATTÉ !</button>
+    </div>
+
+    <div class="footer">
+        <button class="reset-btn" onclick="reset()">Réinitialiser les compteurs</button>
+    </div>
+
+    <script>
+        let data = JSON.parse(localStorage.getItem('fishLogV2')) || {
+            brochet: 0, silure: 0, perche: 0, autre: 0, ratte: 0
+        };
+
+        function refresh() {
+            let total = 0;
+            ['brochet', 'silure', 'perche', 'autre', 'ratte'].forEach(id => {
+                document.getElementById('count-' + id).innerText = data[id];
+                if(id !== 'ratte') total += data[id];
+            });
+            document.getElementById('total-text').innerText = 'PRISES : ' + total;
+            localStorage.setItem('fishLogV2', JSON.stringify(data));
+        }
+
+        function inc(type) {
+            data[type]++;
+            if ("vibrate" in navigator) navigator.vibrate(60);
+            refresh();
+        }
+
+        function reset() {
+            if(confirm("Vider ton carnet de pêche ?")) {
+                data = { brochet: 0, silure: 0, perche: 0, autre: 0, ratte: 0 };
+                refresh();
+            }
+        }
+
+        refresh();
+    </script>
+</body>
+</html>
